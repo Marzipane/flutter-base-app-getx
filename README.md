@@ -1,6 +1,6 @@
-# hizmetkalemiapp
+# flutter base app getx
 
-hizmetkalemiapp
+lutter base app getx
 
 ## Getting Started
 
