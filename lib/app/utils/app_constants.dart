@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import '../models/language_model.dart';
+
+import '../data/models/language_model.dart';
+
 
 class AppConstants {
   static List<LanguageModel> languages = [

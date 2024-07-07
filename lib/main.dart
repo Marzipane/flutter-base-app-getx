@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get.dart';
-import 'app/common/app_colors.dart';
-import 'app/common/app_constants.dart';
-import 'app/common/app_text_themes.dart';
-import 'app/controllers/localizationController.dart';
+import 'app/utils/app_colors.dart';
+import 'app/controllers/localization_controller.dart';
 import 'app/routes/app_pages.dart';
 import 'app/routes/app_routes.dart';
 import 'app/services/localization_service.dart';
+import 'app/utils/app_constants.dart';
+import 'app/utils/app_text_themes.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

@@ -2,8 +2,8 @@
 import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import '../common/app_constants.dart';
-import '../models/language_model.dart';
+import '../data/models/language_model.dart';
+import '../utils/app_constants.dart';
 
 class LocalizationService extends Translations {
   late final Map<String, Map<String, String>> translationKeys;

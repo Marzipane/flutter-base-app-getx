@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../common/app_constants.dart';
+
+import '../utils/app_constants.dart';
 
 class LocalizationController extends GetxController implements GetxService {
   final Rx<Locale> _locale = Rx<Locale>(AppConstants.fallbackLocale);
