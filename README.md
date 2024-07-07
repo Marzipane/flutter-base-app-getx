@@ -1,8 +1,12 @@
 # flutter base app getx
 
-lutter base app getx
+flutter base app getx
 
 ## Getting Started
+To change bundle id and application name
+1. flutter pub global activate rename
+2. rename setAppName --targets ios,android,macos,windows,linux,web --value "your app name"
+3. rename setBundleId --targets ios,android,macos,windows,linux,web --value "com.example.bundleId"
 
 This project is a starting point for a Flutter application.
 
