@@ -92,7 +92,7 @@ BEGIN
             VALUE "CompanyName", "com.hizmetkalemi.hizmetkalemiapp" "\0"
             VALUE "FileDescription", "hizmetkalemiapp" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "com.example.bundleId" "\0"
+            VALUE "InternalName", "com.example.bundleid" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2024 com.hizmetkalemi.hizmetkalemiapp. All rights reserved." "\0"
             VALUE "OriginalFilename", "hizmetkalemiapp.exe" "\0"
             VALUE "ProductName", "hizmetkalemiapp" "\0"

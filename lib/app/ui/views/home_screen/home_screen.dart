@@ -11,7 +11,7 @@ class HomeScreen extends StatelessWidget {
           alignment: Alignment.center,
           child: Row(
             children: [
-              // Text("hello".tr),
+              Text("hello".tr),
               Expanded(flex: 3, child: Container(color: Colors.yellow, height: 50,)),
               Expanded(
                   flex: 7,
@@ -19,6 +19,7 @@ class HomeScreen extends StatelessWidget {
                     color: Colors.red,
                     height: 50,
                   )),
+
             ],
           )),
     );

@@ -2,10 +2,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:hizmetkalemiapp/app/data/repositories/authorization_repository.dart';
-import 'package:hizmetkalemiapp/app/routes/app_routes.dart';
-import 'package:hizmetkalemiapp/app/utils/http_error_handler.dart';
-import 'package:hizmetkalemiapp/app/utils/token_storage.dart';
+import 'package:samplename/app/data/repositories/authorization_repository.dart';
+import 'package:samplename/app/routes/app_routes.dart';
+import 'package:samplename/app/utils/http_error_handler.dart';
+import 'package:samplename/app/utils/token_storage.dart';
 
 import '../data/models/authorization_model.dart'; // Adjust the path as needed
 

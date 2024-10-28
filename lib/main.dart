@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get.dart';
-import 'package:hizmetkalemiapp/app/data/repositories/authorization_repository.dart';
-import 'app/controllers/authorization_controller.dart';
 import 'app/services/api_service.dart';
 import 'app/utils/app_colors.dart';
 import 'app/controllers/localization_controller.dart';
@@ -18,7 +16,7 @@ void main() async {
   Map<String, Map<String, String>> translationKeys =
       await initializeTranslationKeys();
   final apiService = ApiService(
-      baseUrl: 'https://hizmetkalemi.com/api',
+      baseUrl: 'https://sample.com/api',
       commonHeaders: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
@@ -30,9 +28,9 @@ void main() async {
   ));
   // final LaravelApiClient laravelApiClient = LaravelApiClient(http.Client());
   Get.put(LocalizationController());
-  final AuthorizationRepository authorizationRepository =
-  AuthorizationRepository(apiService: apiService);
-  Get.put(AuthorizationController(authorizationRepository: authorizationRepository));
+  // final AuthorizationRepository authorizationRepository =
+  // AuthorizationRepository(apiService: apiService);
+  // Get.put(AuthorizationController(authorizationRepository: authorizationRepository));
   // final OrderRepository ordersRepository =
   // OrderRepository(laravelApiClient);
   // Get.put(OrderController(ordersRepository));
@@ -49,7 +47,7 @@ class MyApp extends StatelessWidget {
     return GetBuilder<LocalizationController>(
         builder: (localizationController) {
       return GetMaterialApp(
-        title: 'hizmetkalemiapp',
+        title: 'sample app',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),

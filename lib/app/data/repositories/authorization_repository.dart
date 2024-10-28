@@ -33,7 +33,6 @@ class AuthorizationRepository {
       'name' : name,
       'email': email,
       'password': password,
-      'user_type' : "oldubiil",
       'mobile_phone' : mobilePhone
     };
 

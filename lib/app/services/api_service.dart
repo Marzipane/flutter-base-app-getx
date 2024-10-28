@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:hizmetkalemiapp/app/utils/token_storage.dart'; // Make sure the path is correct
+import 'package:samplename/app/utils/token_storage.dart'; // Make sure the path is correct
 
 class ApiService {
   final String baseUrl;
