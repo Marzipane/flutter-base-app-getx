@@ -1,7 +1,9 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get.dart';
 import 'app/services/api_service.dart';
+import 'app/services/firebase_api_service.dart';
 import 'app/utils/app_colors.dart';
 import 'app/controllers/localization_controller.dart';
 import 'app/routes/app_pages.dart';
@@ -15,6 +17,11 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   Map<String, Map<String, String>> translationKeys =
       await initializeTranslationKeys();
+  // this will work only if you connected firebase to project and config files were generated
+  await Firebase.initializeApp(
+    // options: DefaultFirebaseOptions.currentPlatform,
+  );
+  await FirebaseApi().initNotifications();
   final apiService = ApiService(
       baseUrl: 'https://sample.com/api',
       commonHeaders: {

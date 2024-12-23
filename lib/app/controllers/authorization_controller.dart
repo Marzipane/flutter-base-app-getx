@@ -1,96 +1,119 @@
 // lib/app/controllers/authorization_controller.dart
-
+import 'dart:convert'; // For jsonEncode
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:samplename/app/data/repositories/authorization_repository.dart';
 import 'package:samplename/app/routes/app_routes.dart';
-import 'package:samplename/app/utils/http_error_handler.dart';
 import 'package:samplename/app/utils/token_storage.dart';
-
-import '../data/models/authorization_model.dart'; // Adjust the path as needed
+import '../data/models/authorization_model.dart';
+import '../excetions/api_exception.dart'; // Adjust the path as needed
 
 class AuthorizationController extends GetxController {
   final AuthorizationRepository authorizationRepository;
   final TokenStorage tokenStorage = TokenStorage();
 
-  AuthorizationController({Key? key, required this.authorizationRepository});
+  AuthorizationController({required this.authorizationRepository});
+
+  /// FocusNodes for text fields
   var emailFocus = FocusNode().obs;
   var passwordFocus = FocusNode().obs;
-  var obscurePassword = true.obs;
   var confirmPasswordFocus = FocusNode().obs;
-  final _isLoading = false.obs;
-  final _authorizationModel = Rxn<AuthorizationModel>();
-  TextEditingController emailController = TextEditingController();
-  var passwordController = TextEditingController();
 
+  /// Toggles password visibility
+  var obscurePassword = true.obs;
+
+  /// Loading indicator
+  final _isLoading = false.obs;
   bool get isLoading => _isLoading.value;
+
+  /// Authorization Model
+  final _authorizationModel = Rxn<AuthorizationModel>();
   AuthorizationModel? get authorizationModel => _authorizationModel.value;
+
+  /// Controllers for input fields
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
 
   @override
   void onInit() {
     super.onInit();
     _checkAuthenticationStatus();
+    // Whenever _authorizationModel changes, evaluate whether to redirect
     ever(_authorizationModel, _redirectBasedOnAuthStatus);
-   // authenticate('johnSmith@gmail.com', '12345678');
   }
 
+  /// Authenticate the user
   Future<void> authenticate() async {
     _isLoading.value = true;
     try {
-      final response =
-          await authorizationRepository.authenticate(emailController.text, passwordController.text);
-      if (response.statusCode == 200) {
-        // Parse the response body
-        final responseBody = response.body;
-        final authorizationModel = authorizationModelFromJson(responseBody);
-        // Update the authorizationModel in the controller
-        _authorizationModel.value = authorizationModel;
-        debugPrint(responseBody);
-        if (_authorizationModel.value != null &&
-            authorizationModel.token != null) {
-          await tokenStorage.saveToken(authorizationModel.token!);
-          debugPrint("TOKEN: ${authorizationModel.token}");
-          Get.snackbar('Success', 'Authentication successful!');
-        }
-        // Save token to secure storage.
+      // Instead of an http.Response, we get a Map<String, dynamic>
+      final data = await authorizationRepository.authenticate(
+        emailController.text,
+        passwordController.text,
+      );
+
+      // Convert Map to JSON string if your parser needs JSON input
+      final jsonString = jsonEncode(data);
+      final authModel = authorizationModelFromJson(jsonString);
+
+      _authorizationModel.value = authModel;
+
+      // If the token is present, store it
+      if (authModel.token != null) {
+        await tokenStorage.saveToken(authModel.token!);
+        debugPrint("TOKEN: ${authModel.token}");
+        Get.snackbar('Success', 'Authentication successful!');
+      }
+    } on ApiException catch (e) {
+      // Handle specific status codes in the controller
+      // This is where you can decide UI navigation or messages
+      if (e.statusCode == 400) {
+        Get.snackbar("Error", "Invalid input for authentication.");
+        // For example, go back to the previous page:
+        Get.back();
+      } else if (e.statusCode == 401) {
+        Get.snackbar("Error", "Unauthorized. Incorrect email or password.");
       } else {
-        // Handle different status codes
-        final error = HttpErrorHandler.handle(response.statusCode);
-        Get.snackbar('Error', error);
+        Get.snackbar("Error", "Unexpected error: ${e.message}");
       }
     } catch (e) {
+      // Catch any other errors
       Get.snackbar('Error', 'An unexpected error occurred');
     } finally {
       _isLoading.value = false;
     }
   }
 
-
+  /// Register a new user
   Future<void> register() async {
     _isLoading.value = true;
     try {
-      final response = await authorizationRepository.register(
-          email: emailController.text,
-          password: emailController.text,
-          name: emailController.text,
-          mobilePhone: emailController.text);
-      if (response.statusCode == 200) {
-        // Parse the response body
-        final responseBody = response.body;
-        final authorizationModel = authorizationModelFromJson(responseBody);
-        // Update the authorizationModel in the controller
-        _authorizationModel.value = authorizationModel;
-        if (_authorizationModel.value != null &&
-            authorizationModel.token != null) {
-          await tokenStorage.saveToken(authorizationModel.token!);
-          debugPrint("TOKEN: ${authorizationModel.token}");
-          Get.snackbar('Success', 'Authentication successful!');
-        }
-        // Save token to secure storage.
+      final data = await authorizationRepository.register(
+        email: emailController.text,
+        password: passwordController.text,
+        name: emailController.text,
+        mobilePhone: emailController.text,
+      );
+
+      final jsonString = jsonEncode(data);
+      final authModel = authorizationModelFromJson(jsonString);
+
+      _authorizationModel.value = authModel;
+
+      if (authModel.token != null) {
+        await tokenStorage.saveToken(authModel.token!);
+        debugPrint("TOKEN: ${authModel.token}");
+        Get.snackbar('Success', 'Registration successful!');
+      }
+    } on ApiException catch (e) {
+      // Handle specific status codes in the controller
+      if (e.statusCode == 400) {
+        Get.snackbar("Error", "Invalid registration data.");
+        // Example: you could do a custom behavior
+      } else if (e.statusCode == 409) {
+        Get.snackbar("Error", "Email already exists.");
       } else {
-        // Handle different status codes
-        final error = HttpErrorHandler.handle(response.statusCode);
-        Get.snackbar('Error', error);
+        Get.snackbar("Error", "Unexpected error: ${e.message}");
       }
     } catch (e) {
       Get.snackbar('Error', 'An unexpected error occurred');
@@ -99,22 +122,22 @@ class AuthorizationController extends GetxController {
     }
   }
 
+  /// Fetch the current user's data
   Future<void> user() async {
     _isLoading.value = true;
     try {
-      final response =
-      await authorizationRepository.user();
-      if (response.statusCode == 200) {
-        // Parse the response body
-        final responseBody = response.body;
-        final authorizationModel = authorizationModelFromJson(responseBody);
-        // Update the authorizationModel in the controller
-        _authorizationModel.value = authorizationModel;
-        // Save token to secure storage.
+      final data = await authorizationRepository.user();
+      final jsonString = jsonEncode(data);
+      final authModel = authorizationModelFromJson(jsonString);
+
+      _authorizationModel.value = authModel;
+    } on ApiException catch (e) {
+      // For example: if statusCode = 401, we could log out or go back
+      if (e.statusCode == 401) {
+        Get.snackbar("Error", "Session expired. Please log in again.");
+        Get.back(); // For instance, navigate back to login page
       } else {
-        // Handle different status codes
-        final error = HttpErrorHandler.handle(response.statusCode);
-        Get.snackbar('Error', error);
+        Get.snackbar("Error", "User Error: ${e.message}");
       }
     } catch (e) {
       Get.snackbar('Error', 'An unexpected error occurred');
@@ -123,23 +146,24 @@ class AuthorizationController extends GetxController {
     }
   }
 
+  /// Check if a token exists in storage and update the model
   Future<void> _checkAuthenticationStatus() async {
     final token = await tokenStorage.getToken();
     if (token != null) {
-      // Token exists, update the authorization model
-      _authorizationModel.value =
-          AuthorizationModel(token: token); // Or however you want to handle it
+      // Create an AuthorizationModel from the existing token
+      _authorizationModel.value = AuthorizationModel(token: token);
     }
   }
 
-  void _redirectBasedOnAuthStatus(AuthorizationModel? authorizationModel) {
-    if (authorizationModel != null && authorizationModel.token != null) {
+  /// Redirect based on authentication status
+  void _redirectBasedOnAuthStatus(AuthorizationModel? model) {
+    if (model != null && model.token != null) {
       // User is authenticated
       Get.toNamed(AppRoutes.home);
     } else {
       // User is not authenticated
-      // Burayı Login sayfası yapıcaksın
-      Get.offAllNamed(AppRoutes.home); // Redirect to login page
+      // Example: redirect to login; adjust route as needed
+      Get.offAllNamed(AppRoutes.home);
     }
   }
 }

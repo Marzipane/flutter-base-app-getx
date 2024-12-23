@@ -1,59 +1,72 @@
-import 'package:flutter/material.dart';
+import 'dart:convert'; // For jsonDecode
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import '../../excetions/api_exception.dart';
 import '../../services/api_service.dart';
 
-class AuthorizationRepository {
+class AuthorizationRepository extends GetxService {
   final ApiService apiService;
 
   AuthorizationRepository({required this.apiService});
 
-  Future<http.Response> authenticate(String email, String password) async {
-    debugPrint("email: $email, password: $password");
+  /// Authenticate the user with email and password
+  Future<Map<String, dynamic>> authenticate(String email, String password) async {
     final body = {
       'email': email,
       'password': password,
     };
 
-    final response = await apiService.postRequest(
-      '/auth',
-      body: body,
-    );
-    debugPrint(response.body);
-    return response;
+    try {
+      final response = await apiService.postRequest('/auth', body: body);
+      return _parseResponse(response);
+    } catch (e) {
+      rethrow; // Allow the controller to handle the error
+    }
   }
 
-  // register
-  Future<http.Response> register({
+  /// Register a new user
+  Future<Map<String, dynamic>> register({
     required String email,
     required String password,
     required String name,
-    required String mobilePhone
+    required String mobilePhone,
   }) async {
     final body = {
-      'name' : name,
+      'name': name,
       'email': email,
       'password': password,
-      'mobile_phone' : mobilePhone
+      'mobile_phone': mobilePhone,
     };
 
-    final response = await apiService.postRequest(
-      '/register',
-      body: body,
-    );
-
-    return response;
+    try {
+      final response = await apiService.postRequest('/register', body: body);
+      return _parseResponse(response);
+    } catch (e) {
+      rethrow; // Allow the controller to handle the error
+    }
   }
 
-  Future<http.Response> user() async {
+  /// Fetch the current user's data
+  Future<Map<String, dynamic>> user() async {
+    try {
+      final response = await apiService.getRequest('/user', withAuth: true);
+      return _parseResponse(response);
+    } catch (e) {
+      rethrow; // Allow the controller to handle the error
+    }
+  }
 
-    final response = await apiService.getRequest(
-      '/user',
-      withAuth: true
-
-    );
-
-    return response;
+  /// Helper method to parse the HTTP response
+  Map<String, dynamic> _parseResponse(http.Response response) {
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      try {
+        return Map<String, dynamic>.from(jsonDecode(response.body));
+      } catch (e) {
+        throw ApiException(response.statusCode, "Invalid response format.");
+      }
+    } else {
+      // Throw an ApiException for non-200 status codes
+      throw ApiException(response.statusCode, response.body.isNotEmpty ? response.body : "Unknown error occurred.");
+    }
   }
 }
-
-
