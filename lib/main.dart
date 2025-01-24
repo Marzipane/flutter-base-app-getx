@@ -2,7 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get.dart';
-import 'app/services/api_service.dart';
+import 'package:samplename/app/bindings/initial_binding.dart';
 import 'app/services/firebase_api_service.dart';
 import 'app/utils/app_colors.dart';
 import 'app/controllers/localization_controller.dart';
@@ -11,7 +11,6 @@ import 'app/routes/app_routes.dart';
 import 'app/services/localization_service.dart';
 import 'app/utils/app_constants.dart';
 import 'app/utils/app_text_themes.dart';
-import 'app/utils/token_storage.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,25 +21,9 @@ void main() async {
     // options: DefaultFirebaseOptions.currentPlatform,
   );
   await FirebaseApi().initNotifications();
-  final apiService = ApiService(
-      baseUrl: 'https://sample.com/api',
-      commonHeaders: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      },
-      tokenStorage: TokenStorage()
-  );
   runApp(MyApp(
     translationKeys: translationKeys,
   ));
-  // final LaravelApiClient laravelApiClient = LaravelApiClient(http.Client());
-  Get.put(LocalizationController());
-  // final AuthorizationRepository authorizationRepository =
-  // AuthorizationRepository(apiService: apiService);
-  // Get.put(AuthorizationController(authorizationRepository: authorizationRepository));
-  // final OrderRepository ordersRepository =
-  // OrderRepository(laravelApiClient);
-  // Get.put(OrderController(ordersRepository));
 }
 
 class MyApp extends StatelessWidget {
@@ -55,6 +38,7 @@ class MyApp extends StatelessWidget {
         builder: (localizationController) {
       return GetMaterialApp(
         title: 'sample app',
+        initialBinding: InitialBinding(),
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
